@@ -1,0 +1,118 @@
+
+{% macro renderSection(section, depth=1, ref="") %}
+<section class="sgsection" id="{{ref}}">
+  <h{{depth+1}} class="sgsection_title">
+    <span class="sgsection_ref">{{ ref }}</span> 
+    {% if section.title %}
+    {{ section.title }}
+    {% else %} 
+      <em>?</em>
+    {% endif %} 
+    <small class="sgsection_file">{{ section.file }}<span class="sgsection_line">:{{ section.line }}</span></small>
+  </h{{depth+1}}>
+  <div class="sgsection_description">
+    <p>{{ section.body | replace("\n\n","</p><p>") | safe }}</p>
+  </div>
+
+  {% if section.blocks.markup %}
+    <div class="sgblock sgblock-markup">
+      <h5 class="sgblock_title">Markup</h5>
+      <pre class="sgmarkup"><code>{{ section.blocks.markup }}</code></pre>
+    </div>
+  {% endif %}
+
+  {% if section.blocks.modifiers %}
+    <div class="sgblock sgblock-modifiers">
+      <h5 class="sgblock_title">Modifiers</h5>
+      <dl>
+        {% for key, value in section.blocks.modifiers %}
+          <dt>{{key}}</dt>
+          <dd>{{value.description}}</dd>
+        {% endfor %}
+      </dl>
+    </div>
+  {% endif %}
+
+  {% if section.blocks.example %}
+    <div class="sgblock sgblock-examples">
+      {% if isArray(section.blocks.example) %}
+        <h5 class="sgblock_title">Examples</h5>
+        {% for example in section.blocks.example %}
+          <div class="sgexample">
+            {% for key, modifier in section.blocks.modifiers %}
+              <template data-modifier="{{key}}">{{ example | wrapIn(section.blocks.wrapper) | nunjucks(modifier) | safe }}</template>
+            {% else %}
+              <template>{{ example | wrapIn(section.blocks.wrapper) | safe }}</template>
+            {% endfor %}
+            <pre class="sgmarkup"><code>{{ example }}</code></pre>
+          </div>
+        {% endfor %}
+      {% else %}
+        <h5 class="sgblock_title">Example</h5>
+        <div class="sgexample">
+          {% for key, modifier in section.blocks.modifiers %}
+            <template data-modifier="{{key}}">{{ section.blocks.example | wrapIn(section.blocks.wrapper) | nunjucks(modifier) | safe }}</template>
+          {% else %}
+            <template>{{ section.blocks.example | wrapIn(section.blocks.wrapper) | safe }}</template>
+          {% endfor %}
+          <pre class="sgmarkup"><code>{{ section.blocks.example }}</code></pre>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %} 
+
+  <div class="sgsection_subsections">
+    {% for section in section.sections %}
+      {{ renderSection(section,depth+1, ref+"."+loop.index) }}
+    {% endfor %}
+  </div>
+</section>
+{% endmacro %}
+
+{% macro index(section, ref) %}
+  <li>
+    <a href="#{{ref}}">{{ ref }} {{ section.title }}</a>
+    {% if section.sections %}
+      <ul>
+        {% for section in section.sections %}
+          {{ index(section, ref+"."+loop.index) }}
+        {% endfor %}
+      </ul>
+    {% endif %}
+  </li>
+{% endmacro %}
+
+<!doctype html>
+<html>
+  <head>
+    <link rel="stylesheet" href="style/styleguide.css" type="text/css"/>
+    <link rel="stylesheet" href="style/highlightjs/github.css" type="text/css"/>
+  </head>
+  <body>
+    <article class="sgroot">
+      <h1 class="sgroot_title">Styleguide</h1> 
+      <ul class="sgindex">
+        {% for section in styleguide.sections %}
+        {{ index(section,loop.index) }}
+        {% endfor %}
+      </ul>
+
+      {% for section in styleguide.sections %}
+      {{ renderSection(section,1,loop.index) }}
+      {% endfor %}
+    </article>
+
+    <script src="js/jquery.min.js"></script>
+    <script src="js/highlight.pack.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <script>
+      // Create shadowroots
+      $(".sgexample template").each(function(_, example) {
+        var shadowParent = $('<div class="sgexample_canvas">').insertAfter(example);
+        var shadowRoot = shadowParent[0].createShadowRoot();
+        shadowParent.attr("data-modifier", example.getAttribute("data-modifier"));
+        shadowRoot.innerHTML = "<style>@import 'style/main.css'</style>"+example.innerHTML;
+      });
+    </script>
+  </body>
+</html>

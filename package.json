@@ -1,0 +1,24 @@
+{
+  "name": "test",
+  "version": "1.0.0",
+  "description": "",
+  "main": "gulpfile.js",
+  "dependencies": {
+    "gulp": "^3.9.1",
+    "gulp-connect": "^4.2.0",
+    "gulp-debug": "^2.1.2",
+    "gulp-guidestyle": "github:kaa/gulp-guidestyle",
+    "gulp-nunjucks-template": "github:kaa/gulp-nunjucks-template",
+    "gulp-plumber": "^1.1.0",
+    "gulp-rename": "^1.2.2",
+    "gulp-util": "^3.0.7",
+    "rimraf": "^2.5.3",
+    "run-sequence": "^1.2.2"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC"
+}

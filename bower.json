@@ -1,0 +1,22 @@
+{
+  "name": "test",
+  "description": "",
+  "main": "gulpfile.js",
+  "authors": [
+    "Joakim Beijar <jbeijar@mios.fi>"
+  ],
+  "license": "ISC",
+  "homepage": "",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "highlightjs": "^9.5.0",
+    "jquery": "^3.1.0"
+  }
+}
